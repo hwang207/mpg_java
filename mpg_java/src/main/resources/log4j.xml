@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration>
+
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<param name="threshold" value="info" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="conversionPattern" value="%p	|	%C{1}	|	%m%n" />
+		</layout>
+	</appender>
+	<appender name="purposeful_file_log" class="org.apache.log4j.RollingFileAppender">
+		<param name="file" value="log/purposeful.log" />
+		<param name="immediateFlush" value="true" />
+		<param name="append" value="false" />
+		<param name="maxFileSize" value="20MB" />
+		<param name="maxBackupIndex" value="10" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="conversionPattern" value="%p	|	%C{1}	|	%m%n" />
+		</layout>
+	</appender>
+
+	<logger name="edu.uic.cs.purposeful" additivity="false">
+		<level value="info" />
+		<appender-ref ref="console" />
+		<appender-ref ref="purposeful_file_log" />
+	</logger>
+	<root>
+		<priority value="warn" />
+		<appender-ref ref="purposeful_file_log" />
+	</root>
+
+</log4j:configuration>
