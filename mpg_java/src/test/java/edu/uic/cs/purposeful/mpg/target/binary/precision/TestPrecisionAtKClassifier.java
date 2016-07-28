@@ -23,8 +23,15 @@ public class TestPrecisionAtKClassifier {
     File file = new File(
         TestPrecisionAtKClassifier.class.getResource("TestPrecisionAtKClassifier.train").toURI());
     double[] thetas = classifier.learn(file, Regularization.l2(0));
+    Prediction<BitSet> prediction = classifier.predict(file, thetas);
+    // prediction = classifier.predict(file); // use just learned thetas by default
 
-    Prediction<BitSet> prediction = classifier.predict(file);
+    // You can write the learned model to a local file
+    // File modelFile = new File("learned.model");
+    // classifier.writeModel(modelFile);
+    // classifier.loadModel(modelFile); // then read it back
+    // prediction = classifier.predict(file); // and predict
+
     System.out.println("Thetas:\t" + Arrays.toString(thetas));
     System.out.println("Golden:\t" + prediction.getGoldenPermutation());
     System.out.println("Prediction:\t" + prediction.getPredictionPermutation());
