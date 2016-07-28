@@ -1,5 +1,29 @@
 ## Setup
-Please refer to [mpg_development_environment_setup.pdf](https://github.com/hwang207/mpg_java/blob/master/mpg_development_environment_setup.pdf) in the root folder of the project.
+There are two options to use MPG framework:
+1. Check out the source into a Eclipse project. Please refer to [mpg_development_environment_setup.pdf](https://github.com/hwang207/mpg_java/blob/master/mpg_development_environment_setup.pdf) in the root folder of the project.
+2. Add MPG as a Maven dependency. Add the following into your 'pom.xml' file:
+```
+<repositories>
+	<repository>
+		<id>mpg_java_release_mvn-repo</id>
+		<url>https://github.com/hwang207/mpg_java/raw/mvn-repo/</url>
+		<releases>
+			<enabled>true</enabled>
+		</releases>
+		<snapshots>
+			<enabled>true</enabled>
+		</snapshots>
+	</repository>
+</repositories>
+
+<dependencies>
+	<dependency>
+		<groupId>edu.uic.cs.purposeful.mpg</groupId>
+		<artifactId>mpg_java</artifactId>
+		<version>1.0.0</version>
+	</dependency>
+</dependencies>
+```
 
 ## Examples
 We have unit-tests that go through training and test procedures:
