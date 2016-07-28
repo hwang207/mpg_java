@@ -1,6 +1,8 @@
 ## Setup
 There are two options to use MPG framework:
+
 1. Check out the source into a Eclipse project. Please refer to [mpg_development_environment_setup.pdf](https://github.com/hwang207/mpg_java/blob/master/mpg_development_environment_setup.pdf) in the root folder of the project.
+
 2. Add MPG as a Maven dependency. Add the following into your 'pom.xml' file:
 ```
 <repositories>
