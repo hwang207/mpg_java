@@ -3,7 +3,8 @@ There are two options to use MPG framework:
 
 1. Check out the source into a Eclipse project. Please refer to [mpg_development_environment_setup.pdf](https://github.com/hwang207/mpg_java/blob/master/mpg_development_environment_setup.pdf) in the root folder of the project.
 
-2. Add MPG as a Maven dependency. Add the following into your 'pom.xml' file:
+2. Use MPG as a Maven dependency by adding the following into your 'pom.xml' file:  
+  *Note that you still need to install Gurobi 6.5 and/or lp_solve as instructed in [mpg_development_environment_setup.pdf](https://github.com/hwang207/mpg_java/blob/master/mpg_development_environment_setup.pdf).*
 ```
 <repositories>
 	<repository>
