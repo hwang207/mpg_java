@@ -21,8 +21,8 @@ There are two options to use MPG framework:
 
 <dependencies>
 	<dependency>
-		<groupId>edu.uic.cs.purposeful.mpg</groupId>
-		<artifactId>mpg_java</artifactId>
+		<groupId>edu.uic.cs.purposeful</groupId>
+		<artifactId>purposeful_mpg</artifactId>
 		<version>1.0.0</version>
 	</dependency>
 </dependencies>

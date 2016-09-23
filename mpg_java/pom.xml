@@ -2,12 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>edu.uic.cs.purposeful.mpg</groupId>
-	<artifactId>mpg_java</artifactId>
+	<groupId>edu.uic.cs.purposeful</groupId>
+	<artifactId>purposeful_mpg</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>mpg_java_release</name>
+	<name>purposeful_mpg_release</name>
 	<url>https://github.com/hwang207/mpg_java</url>
 
 	<properties>
