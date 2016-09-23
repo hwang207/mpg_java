@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import edu.uic.cs.purposeful.mpg.MPGConfig;
+import edu.uic.cs.purposeful.mpg.common.FeatureWiseRegularization;
 import edu.uic.cs.purposeful.mpg.common.Regularization;
 import edu.uic.cs.purposeful.mpg.optimizer.numerical.IterationCallback;
 import edu.uic.cs.purposeful.mpg.optimizer.numerical.NumericalOptimizer;
@@ -62,7 +63,22 @@ public class RosiLBFGSWrapper implements NumericalOptimizer {
   public boolean optimize(double[] thetas, Regularization regularization,
       IterationCallback iterationCallback) {
     objectiveFunction.setRegularization(regularization);
+    return optimize(thetas, iterationCallback);
+  }
 
+  @Override
+  public boolean optimize(double[] thetas, FeatureWiseRegularization featureWiseRegularization) {
+    return optimize(thetas, featureWiseRegularization, null);
+  }
+
+  @Override
+  public boolean optimize(double[] thetas, FeatureWiseRegularization featureWiseRegularization,
+      IterationCallback iterationCallback) {
+    objectiveFunction.setRegularization(featureWiseRegularization);
+    return optimize(thetas, iterationCallback);
+  }
+
+  private boolean optimize(double[] thetas, IterationCallback iterationCallback) {
     // stores the values of the diagonal matrix Hk0
     double[] diag = new double[thetas.length];
 

@@ -1,10 +1,6 @@
 package edu.uic.cs.purposeful.mpg.common;
 
 public class Regularization {
-  public static enum Norm {
-    L1, L2;
-  }
-
   private final Norm norm;
   private final double parameter;
 
@@ -29,9 +25,9 @@ public class Regularization {
     return parameter;
   }
 
-  public Regularization scale(double scale) {
-    return new Regularization(this.norm, parameter * scale);
-  }
+  // public Regularization scale(double scale) {
+  // return new Regularization(this.norm, parameter * scale);
+  // }
 
   @Override
   public String toString() {

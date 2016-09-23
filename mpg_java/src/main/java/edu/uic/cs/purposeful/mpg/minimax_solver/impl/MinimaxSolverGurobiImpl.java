@@ -91,12 +91,14 @@ public class MinimaxSolverGurobiImpl extends MinimaxSolver {
     return descriptionsByErrorCode;
   }
 
+  @Override
   protected Pair<double[], Double> findMaximizerProbabilities(MatrixWrapper scoreMatrix,
-      double minimumScore) {
+      double minimumScore, double maximumScore) {
     GRBModel model = null;
     try {
       // make sure the matrix is positive
       double nonPositiveCompensate = (minimumScore <= 0) ? (1 - minimumScore) : 0.0;
+      double compensatedMaximumScore = maximumScore + nonPositiveCompensate;
 
       model = new GRBModel(ENV);
 
@@ -119,7 +121,8 @@ public class MinimaxSolverGurobiImpl extends MinimaxSolver {
           double originalScore = scoreMatrix.getValue(rowIndex, columnIndex);
           minInMatrix = Math.min(minInMatrix, originalScore);
 
-          double score = originalScore + nonPositiveCompensate;
+          // normalize score to ensure they are not too large
+          double score = (originalScore + nonPositiveCompensate) / compensatedMaximumScore;
           if (Misc.roughlyEquals(score, 0.0)) {
             continue;
           }
@@ -166,11 +169,11 @@ public class MinimaxSolverGurobiImpl extends MinimaxSolver {
       for (int index = 0; index < xArray.length; index++) {
         // the probabilities, round to specified value precision
         xArray[index] = Misc.roundValue(xArray[index] / xSum);
-        // Assert.isTrue(xArray[index] >= 0);
+        Assert.isFalse(Double.isNaN(xArray[index]));
       }
 
-      double value = Misc.roundValue(1.0 / xSum - nonPositiveCompensate);
-
+      double value = Misc.roundValue(compensatedMaximumScore / xSum - nonPositiveCompensate);
+      Assert.isFalse(Double.isNaN(value));
       return Pair.of(xArray, value);
     } catch (GRBException e) {
       throw new PurposefulBaseException(e);

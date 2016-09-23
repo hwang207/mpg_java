@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Doubles;
@@ -25,6 +26,8 @@ import edu.uic.cs.purposeful.mpg.optimizer.game.impl.DoubleOracleGameSolver;
 import edu.uic.cs.purposeful.mpg.target.OptimizationTarget;
 
 public class MaximizerPredictor<Permutation, InitialData> {
+  private static final Logger LOGGER = Logger.getLogger(MaximizerPredictor.class);
+
   public static class Prediction<Permutation> {
     private final int index;
     private final Permutation predictionPermutation;
@@ -133,23 +136,28 @@ public class MaximizerPredictor<Permutation, InitialData> {
     ExecutorService threadPool = Executors.newFixedThreadPool(MPGConfig.THREAD_POOL_SIZE);
     CompletionService<Prediction<Permutation>> completionService =
         new ExecutorCompletionService<>(threadPool);
-
     try {
-      int index = 0;
-      for (InitialData initialData : initialDataList) {
-        completionService
-            .submit(new PredictionTask<>(index++, initialData, thetas, optimizationTargetClass));
+      try {
+        int index = 0;
+        for (InitialData initialData : initialDataList) {
+          completionService
+              .submit(new PredictionTask<>(index++, initialData, thetas, optimizationTargetClass));
+        }
+      } catch (Exception e) {
+        throw new PurposefulBaseException(e);
       }
 
       List<Prediction<Permutation>> result =
           new ArrayList<>(Collections.nCopies(initialDataList.size(), null));
       for (int targetIndex = 0; targetIndex < initialDataList.size(); targetIndex++) {
-        Prediction<Permutation> prediction = completionService.take().get();
-        Assert.isNull(result.set(prediction.index, prediction));
+        try {
+          Prediction<Permutation> prediction = completionService.take().get();
+          Assert.isNull(result.set(prediction.index, prediction));
+        } catch (Exception e) {
+          LOGGER.error("Fail to predict instance.", e);
+        }
       }
       return result;
-    } catch (Exception e) {
-      throw new PurposefulBaseException(e);
     } finally {
       threadPool.shutdown();
     }

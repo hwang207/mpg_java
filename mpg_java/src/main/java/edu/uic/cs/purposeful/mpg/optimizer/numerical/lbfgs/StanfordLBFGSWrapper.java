@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import edu.uic.cs.purposeful.common.assertion.Assert;
 import edu.uic.cs.purposeful.mpg.MPGConfig;
+import edu.uic.cs.purposeful.mpg.common.FeatureWiseRegularization;
 import edu.uic.cs.purposeful.mpg.common.Regularization;
 import edu.uic.cs.purposeful.mpg.optimizer.numerical.IterationCallback;
 import edu.uic.cs.purposeful.mpg.optimizer.numerical.NumericalOptimizer;
@@ -32,7 +33,22 @@ public class StanfordLBFGSWrapper implements NumericalOptimizer {
   public boolean optimize(double[] thetas, Regularization regularization,
       IterationCallback iterationCallback) {
     objectiveFunction.setRegularization(regularization);
+    return optimize(thetas, iterationCallback);
+  }
 
+  @Override
+  public boolean optimize(double[] thetas, FeatureWiseRegularization featureWiseRegularization) {
+    return optimize(thetas, featureWiseRegularization, null);
+  }
+
+  @Override
+  public boolean optimize(double[] thetas, FeatureWiseRegularization featureWiseRegularization,
+      IterationCallback iterationCallback) {
+    objectiveFunction.setRegularization(featureWiseRegularization);
+    return optimize(thetas, iterationCallback);
+  }
+
+  private boolean optimize(double[] thetas, IterationCallback iterationCallback) {
     StanfordCoreNLPQNMinimizerLite lbfgs =
         new StanfordCoreNLPQNMinimizerLite(NUMBER_OF_PREVIOUS_ESTIMATIONS, USE_ROBUST_OPTIONS);
     lbfgs.shutUp();

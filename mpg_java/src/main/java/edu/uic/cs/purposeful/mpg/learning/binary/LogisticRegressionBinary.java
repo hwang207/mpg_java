@@ -16,8 +16,8 @@ import de.bwaldvogel.liblinear.SolverType;
 import edu.uic.cs.purposeful.common.assertion.Assert;
 import edu.uic.cs.purposeful.mpg.MPGConfig;
 import edu.uic.cs.purposeful.mpg.common.Misc;
+import edu.uic.cs.purposeful.mpg.common.Norm;
 import edu.uic.cs.purposeful.mpg.common.Regularization;
-import edu.uic.cs.purposeful.mpg.common.Regularization.Norm;
 import edu.uic.cs.purposeful.mpg.learning.LogisticRegressionHelper;
 import edu.uic.cs.purposeful.mpg.learning.MaximizerPredictor.Prediction;
 

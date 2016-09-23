@@ -2,6 +2,7 @@ package edu.uic.cs.purposeful.mpg.minimax_solver;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import edu.uic.cs.purposeful.common.assertion.Assert;
 import edu.uic.cs.purposeful.mpg.common.ScoreMatrix;
 
 public abstract class MinimaxSolver {
@@ -37,16 +38,21 @@ public abstract class MinimaxSolver {
   protected static final double TIME_OUT_SECONDS = 60;
 
   public Pair<double[], Double> findMaximizerProbabilities(ScoreMatrix scoreMatrix) {
-    return findMaximizerProbabilities(new MatrixWrapper(scoreMatrix), scoreMatrix.getMinimum());
+    Assert.isTrue(scoreMatrix.getRowSize() > 0, "scoreMatrix.getRowSize() <= 0");
+    Assert.isTrue(scoreMatrix.getColumnSize() > 0, "scoreMatrix.getColumnSize() <= 0");
+    return findMaximizerProbabilities(new MatrixWrapper(scoreMatrix), scoreMatrix.getMinimum(),
+        scoreMatrix.getMaximum());
   }
 
   public Pair<double[], Double> findMinimizerProbabilities(ScoreMatrix scoreMatrix) {
-    Pair<double[], Double> internalMinResult =
-        findMaximizerProbabilities(new MatrixWrapper(scoreMatrix, true), -scoreMatrix.getMaximun());
+    Assert.isTrue(scoreMatrix.getRowSize() > 0, "scoreMatrix.getRowSize() <= 0");
+    Assert.isTrue(scoreMatrix.getColumnSize() > 0, "scoreMatrix.getColumnSize() <= 0");
+    Pair<double[], Double> internalMinResult = findMaximizerProbabilities(
+        new MatrixWrapper(scoreMatrix, true), -scoreMatrix.getMaximum(), -scoreMatrix.getMinimum());
     // value is has the same sign with maximizer
     return Pair.of(internalMinResult.getLeft(), -internalMinResult.getRight());
   }
 
   abstract protected Pair<double[], Double> findMaximizerProbabilities(MatrixWrapper matrixWrapper,
-      double minimum);
+      double minimum, double maximum);
 }

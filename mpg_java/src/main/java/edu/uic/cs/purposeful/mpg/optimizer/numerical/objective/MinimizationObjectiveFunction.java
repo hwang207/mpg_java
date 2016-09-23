@@ -2,6 +2,7 @@ package edu.uic.cs.purposeful.mpg.optimizer.numerical.objective;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import edu.uic.cs.purposeful.mpg.common.FeatureWiseRegularization;
 import edu.uic.cs.purposeful.mpg.common.Regularization;
 
 /**
@@ -22,6 +23,8 @@ public interface MinimizationObjectiveFunction {
   double[] getGradients(double[] thetas, int[] indicesInBatch);
 
   void setRegularization(Regularization regularization);
+
+  void setRegularization(FeatureWiseRegularization featureWiseRegularization);
 
   int getNumberOfInstances();
 }

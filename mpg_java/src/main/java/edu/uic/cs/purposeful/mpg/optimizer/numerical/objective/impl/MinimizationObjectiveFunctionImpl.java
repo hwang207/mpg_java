@@ -1,7 +1,6 @@
 package edu.uic.cs.purposeful.mpg.optimizer.numerical.objective.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -17,8 +16,9 @@ import org.apache.log4j.Logger;
 import edu.uic.cs.purposeful.common.assertion.Assert;
 import edu.uic.cs.purposeful.common.assertion.PurposefulBaseException;
 import edu.uic.cs.purposeful.mpg.MPGConfig;
+import edu.uic.cs.purposeful.mpg.common.FeatureWiseRegularization;
+import edu.uic.cs.purposeful.mpg.common.Norm;
 import edu.uic.cs.purposeful.mpg.common.Regularization;
-import edu.uic.cs.purposeful.mpg.common.Regularization.Norm;
 import edu.uic.cs.purposeful.mpg.optimizer.game.ZeroSumGameSolver;
 import edu.uic.cs.purposeful.mpg.optimizer.game.impl.DoubleOracleGameSolver;
 import edu.uic.cs.purposeful.mpg.optimizer.numerical.objective.MinimizationObjectiveFunction;
@@ -176,6 +176,7 @@ public class MinimizationObjectiveFunctionImpl<Permutation, InitialData>
   }
 
   private Regularization regularization;
+  private FeatureWiseRegularization featureWiseRegularization;
   private final List<OptimizationTarget<Permutation, InitialData>> optimizationTargets;
   private final int[] allInstanceIndices;
 
@@ -355,34 +356,59 @@ public class MinimizationObjectiveFunctionImpl<Permutation, InitialData>
 
   @Override
   public void setRegularization(Regularization regularization) {
+    Assert.isNull(featureWiseRegularization,
+        "Feature-wise regularization has been setted, can't use the (uniform) regularization.");
     this.regularization = regularization;
   }
 
+  @Override
+  public void setRegularization(FeatureWiseRegularization featureWiseRegularization) {
+    Assert.isNull(regularization,
+        "(Uniform) regularization has been setted, can't use the feature-wise regularization.");
+    this.featureWiseRegularization = featureWiseRegularization;
+  }
+
   private double computeValueRegularization(double[] thetas) {
-    if (regularization == null) {
+    if (regularization == null && featureWiseRegularization == null) {
       return 0.0;
     }
 
     // do not regularize bias feature's weight
     if (!MPGConfig.REGULARIZE_BIAS_FEATURE && MPGConfig.BIAS_FEATURE_VALUE >= 0) {
       // the last one is the bias feature
-      thetas = Arrays.copyOf(thetas, thetas.length - 1);
+      thetas = thetas.clone();
+      thetas[thetas.length - 1] = 0; // give zero since we don't regularize it
     }
 
     double regularizationScore = 0.0;
-    if (regularization.getNorm() == Norm.L1) {
-      regularizationScore = regularization.getParameter() * norm1(thetas);
-    } else if (regularization.getNorm() == Norm.L2) {
-      regularizationScore = regularization.getParameter() * norm2Square(thetas) / 2;
-    } else {
-      Assert.isTrue(false);
+
+    if (regularization != null) { // uniform regularization
+      if (regularization.getNorm() == Norm.L1) {
+        regularizationScore = regularization.getParameter() * norm1(thetas);
+      } else if (regularization.getNorm() == Norm.L2) {
+        regularizationScore = regularization.getParameter() * norm2Square(thetas) / 2;
+      } else {
+        Assert.canNeverHappen();
+      }
+    } else { // feature-wise regularization
+      double[] regParameters = featureWiseRegularization.getParameters();
+      Assert.isTrue(regParameters.length == thetas.length, "regParameters.length["
+          + regParameters.length + "] != thetas.length[" + thetas.length + "].");
+
+      if (featureWiseRegularization.getNorm() == Norm.L1) {
+        regularizationScore = elementWiseRegularizedNorm1(thetas, regParameters);
+      } else if (featureWiseRegularization.getNorm() == Norm.L2) {
+        regularizationScore = elementWiseRegularizedNorm2Square(thetas, regParameters) / 2;
+      } else {
+        Assert.canNeverHappen();
+      }
     }
     return regularizationScore;
   }
 
   private double[] computeGradientRegularizations(double[] thetas) {
     double[] regularizationScores = new double[thetas.length];
-    if (regularization == null) {
+    if (regularization == null && featureWiseRegularization == null) {
       return regularizationScores;
     }
 
@@ -393,17 +419,36 @@ public class MinimizationObjectiveFunctionImpl<Permutation, InitialData>
       numOfRegularizedWeights--;
     }
 
-    if (regularization.getNorm() == Norm.L1) {
-      for (int index = 0; index < numOfRegularizedWeights; index++) {
-        regularizationScores[index] = regularization.getParameter() * Math.signum(thetas[index]);
+    if (regularization != null) { // uniform regularization
+      if (regularization.getNorm() == Norm.L1) {
+        for (int index = 0; index < numOfRegularizedWeights; index++) {
+          regularizationScores[index] = regularization.getParameter() * Math.signum(thetas[index]);
+        }
+      } else if (regularization.getNorm() == Norm.L2) {
+        for (int index = 0; index < numOfRegularizedWeights; index++) {
+          regularizationScores[index] = regularization.getParameter() * thetas[index];
+        }
+      } else {
+        Assert.canNeverHappen();
       }
-    } else if (regularization.getNorm() == Norm.L2) {
-      for (int index = 0; index < numOfRegularizedWeights; index++) {
-        regularizationScores[index] = regularization.getParameter() * thetas[index];
+    } else { // feature-wise regularization
+      double[] regParameters = featureWiseRegularization.getParameters();
+      Assert.isTrue(regParameters.length == thetas.length, "regParameters.length["
+          + regParameters.length + "] != thetas.length[" + thetas.length + "].");
+
+      if (featureWiseRegularization.getNorm() == Norm.L1) {
+        for (int index = 0; index < numOfRegularizedWeights; index++) {
+          regularizationScores[index] = regParameters[index] * Math.signum(thetas[index]);
+        }
+      } else if (featureWiseRegularization.getNorm() == Norm.L2) {
+        for (int index = 0; index < numOfRegularizedWeights; index++) {
+          regularizationScores[index] = regParameters[index] * thetas[index];
+        }
+      } else {
+        Assert.canNeverHappen();
       }
-    } else {
-      Assert.isTrue(false);
     }
+
     return regularizationScores;
   }
 
@@ -415,6 +460,14 @@ public class MinimizationObjectiveFunctionImpl<Permutation, InitialData>
     return sum;
   }
 
+  private double elementWiseRegularizedNorm1(double[] values, double[] regs) {
+    double regularizedSum = 0;
+    for (int index = 0; index < values.length; index++) {
+      regularizedSum += Math.abs(values[index]) * regs[index];
+    }
+    return regularizedSum;
+  }
+
   private double norm2(double[] values) {
     return Math.sqrt(norm2Square(values));
   }
@@ -423,6 +476,15 @@ public class MinimizationObjectiveFunctionImpl<Permutation, InitialData>
     double norm = 0;
     for (double value : values) {
       norm += value * value;
+    }
+    return norm;
+  }
+
+  private double elementWiseRegularizedNorm2Square(double[] values, double[] regs) {
+    double norm = 0;
+    for (int index = 0; index < values.length; index++) {
+      double value = values[index];
+      norm += value * value * regs[index];
     }
     return norm;
   }

@@ -77,8 +77,6 @@ public class MPGConfig extends AbstractConfig {
       INSTANCE.getDoubleValue("adadelta_terminate_value_tolerance");
   public static final int ADADELTA_NUMBER_OF_ITERATIONS =
       INSTANCE.getIntValue("adadelta_number_of_iterations");
-  public static final boolean ADADELTA_SAMPLE_BATCHES_WITH_REPLACEMENT =
-      INSTANCE.getBooleanValue("adadelta_sample_batches_with_replacement");
 
   // not final, so that it can be changed
   public static boolean SHOW_RUNNING_TRACING = INSTANCE.getBooleanValue("show_running_tracing");

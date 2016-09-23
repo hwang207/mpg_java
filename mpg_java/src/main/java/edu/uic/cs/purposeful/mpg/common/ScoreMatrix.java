@@ -13,7 +13,7 @@ import net.mintern.primitive.pair.IntPair;
  */
 public class ScoreMatrix {
   private final TObjectDoubleHashMap<IntPair> data;
-  private double maximunScore = Double.NEGATIVE_INFINITY;
+  private double maximumScore = Double.NEGATIVE_INFINITY;
   private double minimumScore = Double.POSITIVE_INFINITY;
   private int maxRowIndex = -1;
   private int maxColumnIndex = -1;
@@ -32,7 +32,7 @@ public class ScoreMatrix {
     Assert.isTrue(columnIndex >= 0);
     Assert.isTrue(Double.isNaN(data.put(IntPair.of(rowIndex, columnIndex), value)),
         "Cell[" + rowIndex + "," + columnIndex + "] already has value.");
-    maximunScore = Math.max(maximunScore, value);
+    maximumScore = Math.max(maximumScore, value);
     minimumScore = Math.min(minimumScore, value);
     maxRowIndex = Math.max(maxRowIndex, rowIndex);
     maxColumnIndex = Math.max(maxColumnIndex, columnIndex);
@@ -48,8 +48,8 @@ public class ScoreMatrix {
     return value;
   }
 
-  public double getMaximun() {
-    return maximunScore;
+  public double getMaximum() {
+    return maximumScore;
   }
 
   public double getMinimum() {

@@ -6,6 +6,9 @@ import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
+
 import edu.jhu.hlt.optimize.AdaDelta;
 import edu.jhu.hlt.optimize.AdaDelta.AdaDeltaPrm;
 import edu.jhu.hlt.optimize.BatchSampler;
@@ -105,8 +108,7 @@ public class AdaDeltaSGDLite {
     batchSize = Math.min(numExamples, MPGConfig.THREAD_POOL_SIZE);
     Assert.isTrue(batchSize > 0);
 
-    batchSampler = new BatchSampler(MPGConfig.ADADELTA_SAMPLE_BATCHES_WITH_REPLACEMENT, numExamples,
-        batchSize);
+    batchSampler = new BatchSampler(/* withReplacement */ false, numExamples, batchSize);
 
     iterations = (int) Math.ceil(MPGConfig.ADADELTA_NUMBER_OF_ITERATIONS * numExamples / batchSize);
     Assert.isTrue(iterations > 0);
@@ -160,6 +162,8 @@ public class AdaDeltaSGDLite {
 
     for (; iterCount < iterations; iterCount++) {
       int[] batch = batchSampler.sampleBatch();
+      // make sure no duplicates in one batch, otherwise data cross instances can be corrupted.
+      batch = Ints.toArray(Sets.newHashSet(Ints.asList(batch)));
 
       IntDoubleVector gradient;
       if (MPGConfig.ADADELTA_USE_TERMINATE_VALUE && LOGGER.isTraceEnabled()) {

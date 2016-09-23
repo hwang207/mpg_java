@@ -3,6 +3,7 @@ package edu.uic.cs.purposeful.mpg.optimizer.game.impl;
 import java.util.LinkedHashSet;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.stat.StatUtils;
 import org.apache.log4j.Logger;
 
 import edu.uic.cs.purposeful.common.assertion.Assert;
@@ -76,6 +77,11 @@ public class DoubleOracleGameSolver<Permutation> implements ZeroSumGameSolver<Pe
       Pair<double[], Double> maximizerDistribution =
           minimaxSolver.findMaximizerProbabilities(scoreMatrix);
       maximizerProbabilities = maximizerDistribution.getLeft();
+      if (StatUtils.sum(maximizerProbabilities) == 0) {
+        throw new PurposefulBaseException(
+            "All maximizer probabilities == 0, can't solve the game\n" + scoreMatrix);
+      }
+
       maximizerValue = maximizerDistribution.getRight();
       // reaches Nash equilibrium
       if (Misc.roughlyEquals(previousGameValue, maximizerValue)) {
@@ -127,6 +133,12 @@ public class DoubleOracleGameSolver<Permutation> implements ZeroSumGameSolver<Pe
       Pair<double[], Double> minimizerDistribution =
           minimaxSolver.findMinimizerProbabilities(scoreMatrix);
       minimizerProbabilities = minimizerDistribution.getLeft();
+      double probabilitySum = StatUtils.sum(minimizerProbabilities);
+      if (Misc.roughlyEquals(probabilitySum, 0)) {
+        throw new PurposefulBaseException("All minimizer probabilities == [" + probabilitySum
+            + "], can't solve the game\n" + scoreMatrix);
+      }
+
       minimizerValue = minimizerDistribution.getRight();
       // reaches Nash equilibrium
       if (Misc.roughlyEquals(previousGameValue, minimizerValue)) {
