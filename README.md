@@ -37,8 +37,13 @@ We have unit-tests that go through training and test procedures:
 ## Configurations
 * The configurations of MPG framework can be found in [mpg_config.properties](https://github.com/hwang207/mpg_java/blob/master/mpg_java/config/mpg_config.properties)
 * 'k_percent' for Precision@k is defined in [mpg_precision_at_k_config.properties](https://github.com/hwang207/mpg_java/blob/master/mpg_java/config/mpg_precision_at_k_config.properties)
-* If you are using MPG as a Maven dependency, you need to copy these files to 'config' folder in your own root folder.
-
+* If you are using MPG as a Maven dependency, and want to change any configuration above, you need to create your configuration 'extension' file(s) to override the existing one(s), and put it/them into 'config' folder in your root folder:  
+  **config/mpg_config.properties.extension**  
+  *(for example, it contains 'show_running_tracing=false' to override the default 'show_running_tracing=true')*  
+  
+  **config/mpg_precision_at_k_config.properties.extension**  
+  *(for example, it contains 'k_percent=0.9' to override the default 'k_percent=0.5')*
+  
 ## Citation (BibTeX)
 @inproceedings{wang2015adversarial,  
   title={Adversarial Prediction Games for Multivariate Losses},  
